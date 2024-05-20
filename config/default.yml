@@ -1,0 +1,32 @@
+listening_address: "127.0.0.1:3000"
+
+services:
+  - svc0:
+    url_matching_expression: \/v1\/api\/$
+    service_address: "http://localhost:2021/"
+    backend_prefix_removal: /v1/api
+    request_plugins:
+    - name: test_plugin
+      parameters: parameters
+  - svc1:
+    url_matching_expression: "(/v1/api/Documents/$)"
+    service_address: "http://localhost:2021/////"
+    backend_prefix_removal: /v1/api
+    request_plugins:
+    - name: test_plugin
+      parameters: parameters
+  - svc2:
+    url_matching_expression: "(/target3)"
+    service_address: "http://localhost:20232/target"
+    backend_prefix_removal: /v1/api
+    request_plugins:
+    - name: test_plugin
+      parameters: parameters
+
+logging:
+  log_path: logs/api_gtw_p.log
+  log_level: debug
+  log_to_std_out: false
+  log_file_size_in_bytes: 100000
+  log_response_header_and_body: false
+  log_request_header_and_body: true
