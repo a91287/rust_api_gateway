@@ -1,0 +1,47 @@
+# Binaries for programs and tests
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Executable file for running benchmarks
+*.bench
+
+# Cargo package manager files
+/target/
+/Cargo.lock
+
+# If you use the `cargo install` command to install binaries globally
+# these lines ensure they aren't committed with your project
+.cargo/
+
+# The Rust standard library builds
+!rust-toolchain.toml
+!rust-toolchain
+
+# Ignoring IDE and editor files
+# IntelliJ IDEA and other JetBrains IDEs
+.idea/
+*.iml
+
+# Visual Studio Code
+.vscode/
+
+# Vim/Neovim swap files
+*.swp
+*.swo
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Eclipse
+.project
+.cproject
+.settings/
+
+# Logs
+/logs/
+/*.log
