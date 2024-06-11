@@ -11,6 +11,7 @@ use settings::Settings;
 mod logging;
 
 mod request_handler;
+mod request_filter;
 use request_handler::handle_request;
 use hyper::server::conn::Http;
 

@@ -3,9 +3,12 @@ use hyper::body::Body;
 use log::{debug, info, error};
 use std::convert::Infallible;
 use regex::Regex;
+use crate::request_filter::filter_request;
+use crate::settings::RequestPlugins;
+
 
 pub async fn handle_request(mut req: Request<Body>) -> Result<Response<Body>, Infallible>  {
-    let (svr_addr, prefix_to_remove) = match_uri(req.uri().to_string());
+    let (svr_addr, prefix_to_remove, req_plugins) = match_uri(req.uri().to_string());
     
     //--- BEGIN Extract Request headers ---//
     let mut req_headers_str = String::new();
@@ -34,35 +37,40 @@ pub async fn handle_request(mut req: Request<Body>) -> Result<Response<Body>, In
         debug!("Response:{}Headers:{}{}{}Body:{}{}","\n","\n",req_headers_str,"\n","\n",body_str);
     }
 
-    proxy_request(req, &svr_addr, prefix_to_remove).await
+    let req_copy = filter_request(req, req_plugins);
+
+    proxy_request(req_copy, &svr_addr, prefix_to_remove).await
 }
 
-fn match_uri(uri:String) -> (String, String){
+fn match_uri(uri:String) -> (String, String, Vec<RequestPlugins>){
     //let s = Settings::new().expect("Unalve to instantiate settings");
     let s = super::SETTINGS.clone();
     let sm = s.get_service_mapping();
     let mut backend_address: String = "".to_string();
     let mut prefix_uri_to_remove = "".to_string();
+    let mut request_plugins: Vec<RequestPlugins> = Vec::new();
+
     #[allow(unused_variables)]
     let u = uri.clone();
 
     for svc in sm{
         
-        let re= match Regex::new(&svc.clone().get_url_matching_expression()){
+        let re: Regex= match Regex::new(&svc.clone().get_url_matching_expression()){
             Ok(regex) => regex,
             Err(err) => {
                 eprintln!("Error compiling regex: {}", err);
-                return ("".to_string(),"".to_string(),);
+                return ("".to_string(),"".to_string(), Vec::new());
                 
         }};
         let local_uri = uri.clone();
         if re.is_match(&local_uri) {
             backend_address=svc.clone().get_service_address();
             prefix_uri_to_remove = svc.clone().get_backend_prefix_removal();
+            request_plugins = svc.clone().get_request_plugins();
             break;
         }
     }
-    (backend_address,prefix_uri_to_remove)
+    (backend_address,prefix_uri_to_remove, request_plugins)
 }
 
 fn remove_prefix_from_uri(uri: &str, prefix: &str) -> String {

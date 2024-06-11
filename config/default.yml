@@ -10,10 +10,10 @@ services:
       parameters: parameters
   - svc1:
     url_matching_expression: "(/v1/api/Documents/$)"
-    service_address: "http://localhost:2021/////"
-    backend_prefix_removal: /v1/api
+    service_address: "http://localhost:2021/"
+    backend_prefix_removal: /v1/api/Documents/
     request_plugins:
-    - name: test_plugin
+    - name: src/external_modules/librequest_handler_lib_test.dylib
       parameters: parameters
   - svc2:
     url_matching_expression: "(/target3)"

@@ -87,6 +87,10 @@ pub struct RequestPlugins{
 
 #[allow(dead_code)]
 impl  RequestPlugins {
+    pub fn new(name: String, parameters: String) -> Self {
+        RequestPlugins { name, parameters }
+    }
+
     pub fn get_name(self) -> String{
         self.name.clone()
     }
